@@ -13,12 +13,17 @@ import android.content.Intent;
 
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.myapp.loca.data.AppDatabase;
+import com.example.myapp.loca.data.entity.Location;
 import com.example.myapp.loca.service.ForegroundService;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,17 +32,21 @@ public class MainActivity extends AppCompatActivity {
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
 
-    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(locationServiceEnabled()) {
+        db = AppDatabase.getInstance(getApplicationContext());
+
+        if (locationServiceEnabled()) {
             Log.i(TAG, "GPS 활성화 되있음");
 
-            if(runTimePermissionGranted()) {
+            if (runTimePermissionGranted()) {
                 Log.i(TAG, "Permission 허용 되있음");
             } else {
                 requestRuntimePermission();
@@ -46,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
             showDialogForEnableLocationService();
 
         startService();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        new LoadLocationsTask().execute();
     }
 
     @Override
@@ -143,5 +158,22 @@ public class MainActivity extends AppCompatActivity {
     public void startService() {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         startForegroundService(serviceIntent);
+    }
+
+    class LoadLocationsTask extends AsyncTask<Void, Void, List<Location>> {
+
+        @Override
+        protected void onPostExecute(List<Location> locations) {
+            super.onPostExecute(locations);
+
+            for(Location location : locations) {
+                Log.i(TAG, location.lat + "");
+            }
+        }
+
+        @Override
+        protected List<Location> doInBackground(Void... voids) {
+            return db.getLocationDao().getLocations();
+        }
     }
 }
