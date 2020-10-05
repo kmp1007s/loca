@@ -13,6 +13,7 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
 import com.example.myapp.loca.MainActivity;
+import com.example.myapp.loca.receiver.UpdateLocateBroadcastReceiver;
 import com.example.myapp.loca.R;
 
 public class ForegroundService extends Service {
@@ -35,32 +36,48 @@ public class ForegroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         createNotificationChannel();
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.custom_notification_small);
-        notificationLayout.setTextViewText(R.id.textViewTitle, NOTIFICATION_TITLE);
-        notificationLayout.setTextViewText(R.id.textViewText, NOTIFICATION_TEXT);
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                .setCustomContentView(notificationLayout)
-                .setContentIntent(pendingIntent);
-
-//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setSmallIcon(R.drawable.ic_launcher_foreground)
-//                .setContentTitle(NOTIFICATION_TITLE)
-//                .setContentText(NOTIFICATION_TEXT)
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                .setContentIntent(pendingIntent);
-
-        Notification notification = notificationBuilder.build();
+        RemoteViews customLayout = getCustomNotificationLayout();
+        Notification notification = getCustomNotification(customLayout);
 
         startForeground(NOTIFICATION_ID, notification);
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void setCustomNotificationLayout(RemoteViews customLayout) {
+        Intent locateIntent = new Intent(this, UpdateLocateBroadcastReceiver.class);
+        locateIntent.setAction("UpdateLocate");
+
+        PendingIntent locatePendingIntent = PendingIntent.getBroadcast(this, 0, locateIntent, 0);
+
+        customLayout.setTextViewText(R.id.textViewTitle, NOTIFICATION_TITLE);
+        customLayout.setTextViewText(R.id.textViewText, NOTIFICATION_TEXT);
+        customLayout.setOnClickPendingIntent(R.id.icLocate, locatePendingIntent);
+    }
+
+    private RemoteViews getCustomNotificationLayout() {
+        RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.custom_notification_small);
+        setCustomNotificationLayout(notificationLayout);
+
+        return notificationLayout;
+    }
+
+    private NotificationCompat.Builder buildCustomNotification(RemoteViews customLayout) {
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent notificationPendingIntent =
+                PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(customLayout)
+                .setContentIntent(notificationPendingIntent);
+
+        return notificationBuilder;
+    }
+
+    private Notification getCustomNotification(RemoteViews customLayout) {
+        return buildCustomNotification(customLayout).build();
     }
 
     private void createNotificationChannel() {
