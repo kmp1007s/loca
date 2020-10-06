@@ -56,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
         db = AppDatabase.getInstance(getApplicationContext());
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-////        adapter = new DateAndLocationsAdapter();
-//        binding.recyclerViewDateAndLocations.setAdapter(adapter);
         binding.recyclerViewDateAndLocations.setLayoutManager(layoutManager);
 
         if (locationServiceEnabled()) {
@@ -235,8 +233,6 @@ public class MainActivity extends AppCompatActivity {
                     new DateAndLocationsAdapter(dateAndLocationsForView);
 
             binding.recyclerViewDateAndLocations.setAdapter(dateAndLocationsAdapter);
-
-//            adapter.updateData(dateAndLocationsForView);
         }
 
         @Override

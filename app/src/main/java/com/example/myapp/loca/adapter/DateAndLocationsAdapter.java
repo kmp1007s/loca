@@ -17,7 +17,6 @@ import java.util.List;
 public class DateAndLocationsAdapter extends RecyclerView.Adapter<DateAndLocationsAdapter.DateAndLocationsViewHolder> {
 
     private List<DateAndLocation> data;
-    private LocationsAdapter adapter;
     private RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
 
     public DateAndLocationsAdapter(List<DateAndLocation> dateAndLocations) {
@@ -35,11 +34,6 @@ public class DateAndLocationsAdapter extends RecyclerView.Adapter<DateAndLocatio
             date = itemView.findViewById(R.id.textViewDate);
             locations = itemView.findViewById(R.id.recyclerViewLocations);
         }
-    }
-
-    public void updateData(List<DateAndLocation> data) {
-        this.data = data;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -67,8 +61,6 @@ public class DateAndLocationsAdapter extends RecyclerView.Adapter<DateAndLocatio
         holder.locations.setLayoutManager(layoutManager);
         holder.locations.setAdapter(locationsAdapter);
         holder.locations.setRecycledViewPool(viewPool);
-
-//        adapter.updateData(dateAndLocation.getLocations());
     }
 
     @Override

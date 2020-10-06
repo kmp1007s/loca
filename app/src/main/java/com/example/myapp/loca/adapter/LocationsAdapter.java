@@ -35,11 +35,6 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
         }
     }
 
-    public void updateData(List<Location> data) {
-        this.data = data;
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
     public LocationsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

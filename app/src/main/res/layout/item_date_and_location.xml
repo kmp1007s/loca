@@ -12,11 +12,23 @@
         android:background="#37f266"
         android:padding="16dp"
         android:text="2020.02.02"
-        android:textColor="#ffffff"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="19dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textAlignment="center"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/icDropDownLocations"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_arrow_drop_down"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewDate"
+        app:layout_constraintEnd_toEndOf="@+id/textViewDate"
+        app:layout_constraintTop_toTopOf="@+id/textViewDate" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewLocations"
