@@ -23,6 +23,10 @@ import com.example.myapp.loca.data.AppDatabase;
 import com.example.myapp.loca.data.entity.Location;
 import com.example.myapp.loca.service.ForegroundService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -166,8 +170,51 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<Location> locations) {
             super.onPostExecute(locations);
 
-            for(Location location : locations) {
-                Log.i(TAG, location.lat + "");
+            List<DateAndLocate> dateAndLocatesForView = new ArrayList<>();
+            List<Location> locationsForDateAndLocate = new ArrayList<>();
+
+            int lastLoop = locations.size() - 1;
+
+            for(int i = 0; i < locations.size(); i++) {
+                Location currentLocation = locations.get(i);
+                Log.i(TAG, currentLocation.when);
+
+                if(i == 0) {
+                    locationsForDateAndLocate.add(currentLocation);
+                    continue;
+                }
+
+                Location beforeLocation = locations.get(i - 1);
+
+                LocalDate currentLocationDate =
+                        LocalDateTime.parse(currentLocation.when).toLocalDate();
+                LocalDate beforeLocationDate =
+                        LocalDateTime.parse(beforeLocation.when).toLocalDate();
+
+                if(currentLocationDate.equals(beforeLocationDate)) {
+                    locationsForDateAndLocate.add(currentLocation);
+                } else {
+                    DateAndLocate dateAndLocate = new DateAndLocate();
+                    dateAndLocate.setDate(DateUtil.format(beforeLocationDate));
+                    dateAndLocate.setLocations(locationsForDateAndLocate);
+
+                    dateAndLocatesForView.add(dateAndLocate);
+
+                    locationsForDateAndLocate = new ArrayList<>();
+                    locationsForDateAndLocate.add(currentLocation);
+                }
+
+                if(i == lastLoop) {
+                    DateAndLocate dateAndLocate = new DateAndLocate();
+                    dateAndLocate.setDate(DateUtil.format(currentLocationDate));
+                    dateAndLocate.setLocations(locationsForDateAndLocate);
+
+                    dateAndLocatesForView.add(dateAndLocate);
+                }
+            }
+
+            for(DateAndLocate dal : dateAndLocatesForView) {
+                Log.i(TAG, dal.getDate() + ": " + dal.getLocations().toString());
             }
         }
 
