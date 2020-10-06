@@ -1,6 +1,5 @@
 package com.example.myapp.loca.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +8,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapp.loca.DateTimeUtil;
 import com.example.myapp.loca.R;
 import com.example.myapp.loca.data.entity.Location;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.LocationsViewHolder> {
@@ -46,7 +47,10 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
     public void onBindViewHolder(@NonNull LocationsViewHolder holder, int position) {
         Location location = data.get(position);
 
-        holder.when.setText(location.when);
+        LocalDateTime whenLocalDateTime = LocalDateTime.parse(location.when);
+        String whenFormatted = DateTimeUtil.format(whenLocalDateTime);
+
+        holder.when.setText(whenFormatted);
         holder.latitude.setText(Math.round(location.lat) + "");
         holder.longitude.setText(Math.round(location.lng) + "");
     }
