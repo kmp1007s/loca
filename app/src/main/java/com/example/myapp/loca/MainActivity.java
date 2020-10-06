@@ -7,6 +7,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Intent;
@@ -19,13 +21,14 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.myapp.loca.adapter.DateAndLocationsAdapter;
 import com.example.myapp.loca.data.AppDatabase;
 import com.example.myapp.loca.data.entity.Location;
+import com.example.myapp.loca.databinding.ActivityMainBinding;
 import com.example.myapp.loca.service.ForegroundService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,12 +43,22 @@ public class MainActivity extends AppCompatActivity {
 
     private AppDatabase db;
 
+    private ActivityMainBinding binding;
+    private DateAndLocationsAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         db = AppDatabase.getInstance(getApplicationContext());
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+////        adapter = new DateAndLocationsAdapter();
+//        binding.recyclerViewDateAndLocations.setAdapter(adapter);
+        binding.recyclerViewDateAndLocations.setLayoutManager(layoutManager);
 
         if (locationServiceEnabled()) {
             Log.i(TAG, "GPS 활성화 되있음");
@@ -170,17 +183,16 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<Location> locations) {
             super.onPostExecute(locations);
 
-            List<DateAndLocate> dateAndLocatesForView = new ArrayList<>();
-            List<Location> locationsForDateAndLocate = new ArrayList<>();
+            List<DateAndLocation> dateAndLocationsForView = new ArrayList<>();
+            List<Location> locationsForDateAndLocations = new ArrayList<>();
 
             int lastLoop = locations.size() - 1;
 
             for(int i = 0; i < locations.size(); i++) {
                 Location currentLocation = locations.get(i);
-                Log.i(TAG, currentLocation.when);
 
                 if(i == 0) {
-                    locationsForDateAndLocate.add(currentLocation);
+                    locationsForDateAndLocations.add(currentLocation);
                     continue;
                 }
 
@@ -192,30 +204,39 @@ public class MainActivity extends AppCompatActivity {
                         LocalDateTime.parse(beforeLocation.when).toLocalDate();
 
                 if(currentLocationDate.equals(beforeLocationDate)) {
-                    locationsForDateAndLocate.add(currentLocation);
+                    locationsForDateAndLocations.add(currentLocation);
                 } else {
-                    DateAndLocate dateAndLocate = new DateAndLocate();
-                    dateAndLocate.setDate(DateUtil.format(beforeLocationDate));
-                    dateAndLocate.setLocations(locationsForDateAndLocate);
+                    DateAndLocation dateAndLocation = new DateAndLocation(
+                            DateUtil.format(beforeLocationDate),
+                            locationsForDateAndLocations
+                    );
 
-                    dateAndLocatesForView.add(dateAndLocate);
+                    dateAndLocationsForView.add(dateAndLocation);
 
-                    locationsForDateAndLocate = new ArrayList<>();
-                    locationsForDateAndLocate.add(currentLocation);
+                    locationsForDateAndLocations = new ArrayList<>();
+                    locationsForDateAndLocations.add(currentLocation);
                 }
 
                 if(i == lastLoop) {
-                    DateAndLocate dateAndLocate = new DateAndLocate();
-                    dateAndLocate.setDate(DateUtil.format(currentLocationDate));
-                    dateAndLocate.setLocations(locationsForDateAndLocate);
+                    DateAndLocation dateAndLocation = new DateAndLocation(
+                            DateUtil.format(currentLocationDate),
+                            locationsForDateAndLocations
+                    );
 
-                    dateAndLocatesForView.add(dateAndLocate);
+                    dateAndLocationsForView.add(dateAndLocation);
                 }
             }
 
-            for(DateAndLocate dal : dateAndLocatesForView) {
+            for(DateAndLocation dal : dateAndLocationsForView) {
                 Log.i(TAG, dal.getDate() + ": " + dal.getLocations().toString());
             }
+
+            DateAndLocationsAdapter dateAndLocationsAdapter =
+                    new DateAndLocationsAdapter(dateAndLocationsForView);
+
+            binding.recyclerViewDateAndLocations.setAdapter(dateAndLocationsAdapter);
+
+//            adapter.updateData(dateAndLocationsForView);
         }
 
         @Override

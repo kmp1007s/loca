@@ -4,9 +4,14 @@ import com.example.myapp.loca.data.entity.Location;
 
 import java.util.List;
 
-public class DateAndLocate {
+public class DateAndLocation {
     private String date;
     private List<Location> locations;
+
+    public DateAndLocation(String date, List<Location> locations) {
+        this.date = date;
+        this.locations = locations;
+    }
 
     public String getDate() {
         return date;
