@@ -181,53 +181,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<Location> locations) {
             super.onPostExecute(locations);
 
-            List<DateAndLocation> dateAndLocationsForView = new ArrayList<>();
-            List<Location> locationsForDateAndLocations = new ArrayList<>();
-
-            int lastLoop = locations.size() - 1;
-
-            for(int i = 0; i < locations.size(); i++) {
-                Location currentLocation = locations.get(i);
-
-                if(i == 0) {
-                    locationsForDateAndLocations.add(currentLocation);
-                    continue;
-                }
-
-                Location beforeLocation = locations.get(i - 1);
-
-                LocalDate currentLocationDate =
-                        LocalDateTime.parse(currentLocation.when).toLocalDate();
-                LocalDate beforeLocationDate =
-                        LocalDateTime.parse(beforeLocation.when).toLocalDate();
-
-                if(currentLocationDate.equals(beforeLocationDate)) {
-                    locationsForDateAndLocations.add(currentLocation);
-                } else {
-                    DateAndLocation dateAndLocation = new DateAndLocation(
-                            DateUtil.format(beforeLocationDate),
-                            locationsForDateAndLocations
-                    );
-
-                    dateAndLocationsForView.add(dateAndLocation);
-
-                    locationsForDateAndLocations = new ArrayList<>();
-                    locationsForDateAndLocations.add(currentLocation);
-                }
-
-                if(i == lastLoop) {
-                    DateAndLocation dateAndLocation = new DateAndLocation(
-                            DateUtil.format(currentLocationDate),
-                            locationsForDateAndLocations
-                    );
-
-                    dateAndLocationsForView.add(dateAndLocation);
-                }
-            }
-
-            for(DateAndLocation dal : dateAndLocationsForView) {
-                Log.i(TAG, dal.getDate() + ": " + dal.getLocations().toString());
-            }
+            List<DateAndLocation> dateAndLocationsForView =
+                    DateAndLocation.makeDateAndLocationList(locations);
 
             DateAndLocationsAdapter dateAndLocationsAdapter =
                     new DateAndLocationsAdapter(dateAndLocationsForView, getApplicationContext());

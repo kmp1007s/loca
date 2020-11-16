@@ -65,7 +65,10 @@ public class DateAndLocationsAdapter extends RecyclerView.Adapter<DateAndLocatio
         );
         layoutManager.setInitialPrefetchItemCount(dateAndLocation.getLocations().size());
 
-        LocationsAdapter locationsAdapter = new LocationsAdapter(dateAndLocation.getLocations(), context);
+        LocationsAdapter locationsAdapter = new LocationsAdapter(
+                dateAndLocation.getLocations(),
+                context
+        );
 
         holder.locations.setLayoutManager(layoutManager);
         holder.locations.setAdapter(locationsAdapter);
