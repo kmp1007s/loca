@@ -1,5 +1,8 @@
 package com.example.myapp.loca.adapter;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +15,18 @@ import com.example.myapp.loca.DateTimeUtil;
 import com.example.myapp.loca.R;
 import com.example.myapp.loca.data.entity.Location;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.LocationsViewHolder> {
     private List<Location> data;
+    private Context context;
 
-    public LocationsAdapter(List<Location> data) {this.data = data;}
+    public LocationsAdapter(List<Location> data, Context context) {
+        this.data = data;
+        this.context = context;
+    }
 
     class LocationsViewHolder extends RecyclerView.ViewHolder {
         TextView address;
@@ -45,14 +53,28 @@ public class LocationsAdapter extends RecyclerView.Adapter<LocationsAdapter.Loca
 
     @Override
     public void onBindViewHolder(@NonNull LocationsViewHolder holder, int position) {
-        Location location = data.get(position);
+        Geocoder geocoder = new Geocoder(context);
 
-        LocalDateTime whenLocalDateTime = LocalDateTime.parse(location.when);
-        String whenFormatted = DateTimeUtil.format(whenLocalDateTime);
+        try {
+            Location location = data.get(position);
 
-        holder.when.setText(whenFormatted);
-        holder.latitude.setText(Math.round(location.lat) + "");
-        holder.longitude.setText(Math.round(location.lng) + "");
+            LocalDateTime whenLocalDateTime = LocalDateTime.parse(location.when);
+            String whenFormatted = DateTimeUtil.format(whenLocalDateTime);
+
+            List<Address> addresses = geocoder.getFromLocation(
+                    location.lat,
+                    location.lng,
+                    1
+            );
+            holder.address.setText(addresses.get(0).getAddressLine(0));
+            holder.when.setText(whenFormatted);
+            holder.latitude.setText(Math.round(location.lat) + "");
+            holder.longitude.setText(Math.round(location.lng) + "");
+        }
+
+         catch(IOException e) {
+             e.printStackTrace();
+         }
     }
 
     @Override

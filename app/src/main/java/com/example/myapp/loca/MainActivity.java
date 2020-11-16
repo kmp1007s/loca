@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             DateAndLocationsAdapter dateAndLocationsAdapter =
-                    new DateAndLocationsAdapter(dateAndLocationsForView);
+                    new DateAndLocationsAdapter(dateAndLocationsForView, getApplicationContext());
 
             binding.recyclerViewDateAndLocations.setAdapter(dateAndLocationsAdapter);
         }

@@ -9,7 +9,7 @@
         android:id="@+id/textViewDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#37f266"
+        android:background="@color/blue"
         android:padding="16dp"
         android:text="2020.02.02"
         android:textAlignment="center"
