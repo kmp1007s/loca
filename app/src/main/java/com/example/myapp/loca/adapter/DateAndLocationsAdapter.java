@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapp.loca.DateAndLocation;
 import com.example.myapp.loca.R;
+import com.example.myapp.loca.data.entity.Location;
 
 import java.util.List;
 
@@ -31,12 +32,15 @@ public class DateAndLocationsAdapter extends RecyclerView.Adapter<DateAndLocatio
 
         TextView date;
         RecyclerView locations;
+        boolean itemShown;
 
         public DateAndLocationsViewHolder(@NonNull View itemView) {
             super(itemView);
 
             date = itemView.findViewById(R.id.textViewDate);
             locations = itemView.findViewById(R.id.recyclerViewLocations);
+
+            itemShown = true;
         }
     }
 
@@ -50,6 +54,7 @@ public class DateAndLocationsAdapter extends RecyclerView.Adapter<DateAndLocatio
     @Override
     public void onBindViewHolder(@NonNull DateAndLocationsViewHolder holder, int position) {
         DateAndLocation dateAndLocation = data.get(position);
+        List<Location> emptyLocations = null;
 
         holder.date.setText(dateAndLocation.getDate());
 
@@ -65,6 +70,19 @@ public class DateAndLocationsAdapter extends RecyclerView.Adapter<DateAndLocatio
         holder.locations.setLayoutManager(layoutManager);
         holder.locations.setAdapter(locationsAdapter);
         holder.locations.setRecycledViewPool(viewPool);
+
+        holder.itemView.setOnClickListener(v -> {
+            final List<Location> locations = holder.itemShown ?
+                    emptyLocations : dateAndLocation.getLocations();
+            final LocationsAdapter newLocationsAdapter =
+                    new LocationsAdapter(locations, context);
+
+            holder.locations.setLayoutManager(layoutManager);
+            holder.locations.setAdapter(newLocationsAdapter);
+            holder.locations.setRecycledViewPool(viewPool);
+
+            holder.itemShown = !holder.itemShown;
+        });
     }
 
     @Override
